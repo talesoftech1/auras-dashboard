@@ -98,7 +98,10 @@ export async function saveFaq(formData: FormData) {
     question,
     answer,
   });
+  // Rebuild the system prompt so the new/edited FAQ takes effect immediately.
+  await callN8n("rebuild_prompt", userId, { bot_id: botId });
   revalidatePath("/dashboard/knowledge");
+  revalidatePath("/dashboard/settings");
 }
 
 export async function deleteFaq(formData: FormData) {
@@ -112,5 +115,8 @@ export async function deleteFaq(formData: FormData) {
     answer: "",
     delete: true,
   });
+  // Rebuild after delete so the prompt no longer references the removed FAQ.
+  await callN8n("rebuild_prompt", userId, { bot_id: botId });
   revalidatePath("/dashboard/knowledge");
+  revalidatePath("/dashboard/settings");
 }
