@@ -55,7 +55,9 @@ export default async function KnowledgePage() {
                     Uploaded {formatDistanceToNow(d.uploaded_at)}
                     {d.extracted_text
                       ? ` · ${d.extracted_text.length.toLocaleString()} chars extracted`
-                      : " · extracting..."}
+                      : isExtractable(d.file_name)
+                        ? " · extracting..."
+                        : " · stored — format not yet readable, convert to PDF for the bot to use"}
                   </div>
                 </div>
                 <form action={deleteDocument}>
@@ -145,4 +147,14 @@ export default async function KnowledgePage() {
       </section>
     </div>
   );
+}
+
+/**
+ * Returns true if the ingest workflow can actually pull text out of this file.
+ * Anything outside this list ends up in storage but with empty extracted_text,
+ * so the dashboard should show a clearer message than "extracting...".
+ */
+function isExtractable(fileName: string): boolean {
+  const ext = fileName.toLowerCase().split(".").pop() ?? "";
+  return ["pdf", "txt", "md", "markdown"].includes(ext);
 }
