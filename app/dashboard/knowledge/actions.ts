@@ -66,7 +66,10 @@ export async function ingestUploadedDoc(formData: FormData) {
     storage_path: storagePath,
     mime_type: mimeType,
   });
+  // Rebuild the prompt so the new doc's text is included immediately.
+  await callN8n("rebuild_prompt", userId, { bot_id: botId });
   revalidatePath("/dashboard/knowledge");
+  revalidatePath("/dashboard/settings");
 }
 
 export async function deleteDocument(formData: FormData) {
