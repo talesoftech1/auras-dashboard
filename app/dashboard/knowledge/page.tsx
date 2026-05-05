@@ -2,6 +2,7 @@ import { requireBot } from "@/lib/bot";
 import { createClient } from "@/lib/supabase/server";
 import type { DocumentRow, Faq } from "@/lib/types";
 import { formatDistanceToNow } from "@/lib/format";
+import { SubmitButton } from "@/components/submit-button";
 import { deleteDocument, saveFaq, deleteFaq } from "./actions";
 import { UploadButton } from "./upload-button";
 
@@ -65,12 +66,12 @@ export default async function KnowledgePage() {
                     name="storage_path"
                     value={d.storage_path}
                   />
-                  <button
-                    type="submit"
+                  <SubmitButton
+                    pendingText="Removing..."
                     className="text-muted-foreground hover:text-destructive"
                   >
                     Remove
-                  </button>
+                  </SubmitButton>
                 </form>
               </li>
             ))}
@@ -111,12 +112,12 @@ export default async function KnowledgePage() {
               required
             />
           </div>
-          <button
-            type="submit"
+          <SubmitButton
+            pendingText="Adding..."
             className="h-9 rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground hover:bg-primary/90"
           >
             Add FAQ
-          </button>
+          </SubmitButton>
         </form>
 
         {faqs.length > 0 && (
@@ -130,12 +131,12 @@ export default async function KnowledgePage() {
                 <form action={deleteFaq}>
                   <input type="hidden" name="bot_id" value={bot.id} />
                   <input type="hidden" name="faq_id" value={f.id} />
-                  <button
-                    type="submit"
+                  <SubmitButton
+                    pendingText="Removing..."
                     className="text-muted-foreground hover:text-destructive"
                   >
                     Remove
-                  </button>
+                  </SubmitButton>
                 </form>
               </li>
             ))}

@@ -1,4 +1,5 @@
 import { requireBot } from "@/lib/bot";
+import { SubmitButton } from "@/components/submit-button";
 import {
   updateBusinessDetails,
   updateSystemPrompt,
@@ -46,17 +47,16 @@ export default async function SettingsPage() {
             <span>Trigger keyword: <span className="font-mono">{bot.trigger_keyword}</span></span>
             <span>Status: <span className="font-medium capitalize">{bot.status}</span></span>
           </div>
-          <button
-            type="submit"
+          <SubmitButton
+            pendingText="Saving..."
             className="h-9 rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground hover:bg-primary/90"
           >
             Save business details
-          </button>
+          </SubmitButton>
         </div>
       </form>
 
-      <form action={updateSystemPrompt} className="rounded-xl border bg-card shadow">
-        <input type="hidden" name="bot_id" value={bot.id} />
+      <section className="rounded-xl border bg-card shadow">
         <div className="flex flex-col space-y-1.5 p-6">
           <div className="font-semibold tracking-tight">System prompt</div>
           <div className="text-sm text-muted-foreground">
@@ -71,29 +71,34 @@ export default async function SettingsPage() {
           )}
         </div>
         <div className="space-y-3 p-6 pt-0">
-          <textarea
-            name="system_prompt"
-            rows={16}
-            defaultValue={bot.system_prompt ?? ""}
-            className="w-full rounded-md border bg-muted p-4 font-mono text-xs shadow-sm"
-          />
-          <div className="flex items-center gap-2">
-            <button
-              type="submit"
-              className="h-9 rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground hover:bg-primary/90"
-            >
-              Save prompt
-            </button>
-            <button
-              type="submit"
-              formAction={rebuildFromKnowledge}
+          <form action={updateSystemPrompt} className="space-y-3">
+            <input type="hidden" name="bot_id" value={bot.id} />
+            <textarea
+              name="system_prompt"
+              rows={16}
+              defaultValue={bot.system_prompt ?? ""}
+              className="w-full rounded-md border bg-muted p-4 font-mono text-xs shadow-sm"
+            />
+            <div className="flex items-center gap-2">
+              <SubmitButton
+                pendingText="Saving..."
+                className="h-9 rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground hover:bg-primary/90"
+              >
+                Save prompt
+              </SubmitButton>
+            </div>
+          </form>
+          <form action={rebuildFromKnowledge}>
+            <input type="hidden" name="bot_id" value={bot.id} />
+            <SubmitButton
+              pendingText="Rebuilding..."
               className="h-9 rounded-md border px-4 text-sm hover:bg-muted"
             >
               Rebuild from knowledge
-            </button>
-          </div>
+            </SubmitButton>
+          </form>
         </div>
-      </form>
+      </section>
     </div>
   );
 }

@@ -2,8 +2,25 @@
 
 import { randomUUID } from "crypto";
 import { revalidatePath } from "next/cache";
+import { after } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { callN8n } from "@/lib/n8n";
+
+/**
+ * Kick off a system-prompt rebuild in the background. The user's action
+ * returns as soon as the primary write succeeds; the rebuild lands a
+ * second or two later. We swallow any error since the prompt will rebuild
+ * on the next change anyway, and surfacing it would mask the primary write.
+ */
+function scheduleRebuild(userId: string, botId: string) {
+  after(async () => {
+    try {
+      await callN8n("rebuild_prompt", userId, { bot_id: botId });
+    } catch (err) {
+      console.error("Background rebuild_prompt failed", err);
+    }
+  });
+}
 
 async function requireUser(botId: string) {
   const supabase = await createClient();
@@ -66,8 +83,8 @@ export async function ingestUploadedDoc(formData: FormData) {
     storage_path: storagePath,
     mime_type: mimeType,
   });
-  // Rebuild the prompt so the new doc's text is included immediately.
-  await callN8n("rebuild_prompt", userId, { bot_id: botId });
+  // Rebuild the prompt in the background so the user gets a fast response.
+  scheduleRebuild(userId, botId);
   revalidatePath("/dashboard/knowledge");
   revalidatePath("/dashboard/settings");
 }
@@ -82,8 +99,8 @@ export async function deleteDocument(formData: FormData) {
   await supabase.storage.from("bot-documents").remove([storagePath]);
   await supabase.from("documents").delete().eq("id", docId);
 
-  // Rebuild the system prompt since knowledge changed.
-  await callN8n("rebuild_prompt", userId, { bot_id: botId });
+  // Rebuild in the background — the row is gone, so the UI updates immediately.
+  scheduleRebuild(userId, botId);
   revalidatePath("/dashboard/knowledge");
 }
 
@@ -101,8 +118,8 @@ export async function saveFaq(formData: FormData) {
     question,
     answer,
   });
-  // Rebuild the system prompt so the new/edited FAQ takes effect immediately.
-  await callN8n("rebuild_prompt", userId, { bot_id: botId });
+  // Rebuild in the background so the FAQ appears in the prompt within a couple seconds.
+  scheduleRebuild(userId, botId);
   revalidatePath("/dashboard/knowledge");
   revalidatePath("/dashboard/settings");
 }
@@ -118,8 +135,8 @@ export async function deleteFaq(formData: FormData) {
     answer: "",
     delete: true,
   });
-  // Rebuild after delete so the prompt no longer references the removed FAQ.
-  await callN8n("rebuild_prompt", userId, { bot_id: botId });
+  // Rebuild in the background.
+  scheduleRebuild(userId, botId);
   revalidatePath("/dashboard/knowledge");
   revalidatePath("/dashboard/settings");
 }
