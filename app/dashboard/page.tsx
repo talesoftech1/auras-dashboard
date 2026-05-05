@@ -1,7 +1,5 @@
-import { redirect } from "next/navigation";
 import Link from "next/link";
-import { createClient } from "@/lib/supabase/server";
-import type { Bot } from "@/lib/types";
+import { requireBot } from "@/lib/bot";
 import {
   Card,
   CardContent,
@@ -11,24 +9,7 @@ import {
 } from "@/components/ui/card";
 
 export default async function DashboardHome() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) redirect("/login");
-
-  const { data: bots } = await supabase
-    .from("bots")
-    .select("*")
-    .eq("owner_user_id", user.id)
-    .order("created_at", { ascending: false })
-    .returns<Bot[]>();
-
-  if (!bots || bots.length === 0) {
-    redirect("/onboarding");
-  }
-
-  const primary = bots[0];
+  const { bot: primary } = await requireBot();
 
   return (
     <div className="mx-auto max-w-5xl space-y-8">
