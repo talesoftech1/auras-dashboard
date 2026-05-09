@@ -8,6 +8,7 @@ const WEBHOOKS = {
   ingest_doc: process.env.N8N_INGEST_DOC_URL,
   rebuild_prompt: process.env.N8N_REBUILD_PROMPT_URL,
   update_bot: process.env.N8N_UPDATE_BOT_URL,
+  bot_factory: process.env.N8N_BOT_FACTORY_URL,
 } as const;
 
 type WebhookName = keyof typeof WEBHOOKS;
