@@ -35,6 +35,7 @@ export async function updateSession(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
   const isAuthRoute =
     pathname === "/login" ||
+    pathname === "/signup" ||
     pathname.startsWith("/auth") ||
     pathname === "/";
 
@@ -46,10 +47,10 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  // If user is signed in and on /login, bounce to dashboard.
-  if (user && pathname === "/login") {
+  // If user is signed in and on /login or /signup, bounce them somewhere useful.
+  if (user && (pathname === "/login" || pathname === "/signup")) {
     const url = request.nextUrl.clone();
-    url.pathname = "/dashboard";
+    url.pathname = pathname === "/signup" ? "/onboarding" : "/dashboard";
     return NextResponse.redirect(url);
   }
 
