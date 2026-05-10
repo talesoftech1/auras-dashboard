@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import type { UnansweredQuestion } from "@/lib/types";
 import { formatDistanceToNow } from "@/lib/format";
 import { saveAsFaq, markResolved, ignoreQuestion } from "./actions";
+import { UnansweredCardActions } from "./unanswered-card-actions";
 
 export default async function UnansweredPage() {
   const { bot } = await requireBot();
@@ -62,43 +63,14 @@ function QuestionCard({
           </div>
         </div>
 
-        <form action={saveAsFaq} className="mt-4 space-y-2">
-          <input type="hidden" name="bot_id" value={botId} />
-          <input type="hidden" name="question_id" value={question.id} />
-          <input type="hidden" name="question" value={question.question} />
-          <label className="text-xs font-medium text-muted-foreground">
-            Teach the bot
-          </label>
-          <textarea
-            name="answer"
-            rows={2}
-            placeholder="Type the answer the bot should have given..."
-            className="w-full rounded-md border bg-transparent p-2 text-sm shadow-sm"
-            required
-          />
-          <div className="flex items-center gap-2">
-            <button
-              type="submit"
-              className="h-8 rounded-md bg-primary px-3 text-xs font-medium text-primary-foreground hover:bg-primary/90"
-            >
-              Save as FAQ
-            </button>
-            <button
-              type="submit"
-              formAction={markResolved}
-              className="h-8 rounded-md border px-3 text-xs hover:bg-muted"
-            >
-              Mark resolved
-            </button>
-            <button
-              type="submit"
-              formAction={ignoreQuestion}
-              className="h-8 rounded-md border px-3 text-xs text-muted-foreground hover:bg-muted"
-            >
-              Ignore
-            </button>
-          </div>
-        </form>
+        <UnansweredCardActions
+          botId={botId}
+          questionId={question.id}
+          question={question.question}
+          saveAsFaq={saveAsFaq}
+          markResolved={markResolved}
+          ignoreQuestion={ignoreQuestion}
+        />
       </div>
     </div>
   );
