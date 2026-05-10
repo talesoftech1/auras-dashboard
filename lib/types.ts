@@ -21,6 +21,8 @@ export type Bot = {
     | null;
   whatsapp_phone_number: string | null;
   whatsapp_phone_number_id: string | null;
+  raw_scrape: string | null;
+  raw_scrape_updated_at: string | null;
   created_at: string;
 };
 

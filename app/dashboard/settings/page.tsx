@@ -1,9 +1,11 @@
 import { requireBot } from "@/lib/bot";
 import { SubmitButton } from "@/components/submit-button";
+import { formatDistanceToNow } from "@/lib/format";
 import {
   updateBusinessDetails,
   updateSystemPrompt,
   rebuildFromKnowledge,
+  refreshWebsiteKnowledge,
 } from "./actions";
 
 export default async function SettingsPage() {
@@ -55,6 +57,46 @@ export default async function SettingsPage() {
           </SubmitButton>
         </div>
       </form>
+
+      <section className="rounded-xl border bg-card shadow">
+        <div className="flex flex-col space-y-1.5 p-6">
+          <div className="font-semibold tracking-tight">Website knowledge</div>
+          <div className="text-sm text-muted-foreground">
+            We re-scrape your site and rebuild the bot&apos;s knowledge base.
+            Your FAQs and uploaded documents are kept as-is.
+          </div>
+        </div>
+        <div className="space-y-3 p-6 pt-0 text-sm">
+          <form action={refreshWebsiteKnowledge} className="space-y-3">
+            <input type="hidden" name="bot_id" value={bot.id} />
+            <Field
+              id="website_url"
+              label="Website URL"
+              type="url"
+              defaultValue={bot.website_url ?? ""}
+            />
+            <div className="flex items-center justify-between gap-3">
+              <p className="text-xs text-muted-foreground">
+                {bot.raw_scrape_updated_at
+                  ? `Last refreshed ${formatDistanceToNow(bot.raw_scrape_updated_at)}`
+                  : bot.raw_scrape
+                    ? "Refreshed (timestamp unavailable)"
+                    : "Not yet scraped"}
+              </p>
+              <SubmitButton
+                pendingText="Starting..."
+                className="h-9 rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground hover:bg-primary/90"
+              >
+                Refresh website knowledge
+              </SubmitButton>
+            </div>
+            <p className="rounded-md border bg-muted/40 p-3 text-xs text-muted-foreground">
+              Scraping and recomposing usually takes 60-90 seconds. Refresh this
+              page after a minute to see the updated prompt.
+            </p>
+          </form>
+        </div>
+      </section>
 
       <section className="rounded-xl border bg-card shadow">
         <div className="flex flex-col space-y-1.5 p-6">
