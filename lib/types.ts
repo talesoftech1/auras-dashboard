@@ -13,6 +13,14 @@ export type Bot = {
   status: "pending" | "active" | "paused" | "cancelled" | string;
   takeover_mode: boolean | null;
   takeover_until: string | null;
+  whatsapp_setup_status:
+    | "using_shared"
+    | "pending_provisioning"
+    | "connected"
+    | "failed"
+    | null;
+  whatsapp_phone_number: string | null;
+  whatsapp_phone_number_id: string | null;
   created_at: string;
 };
 
