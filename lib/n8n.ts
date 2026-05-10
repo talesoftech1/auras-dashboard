@@ -35,12 +35,24 @@ export async function callN8n<T = unknown>(
     body: JSON.stringify(payload),
   });
 
+  const raw = await res.text();
+
   if (!res.ok) {
-    const text = await res.text().catch(() => "");
     throw new Error(
-      `n8n webhook ${name} failed: ${res.status} ${text.slice(0, 200)}`
+      `n8n webhook ${name} failed: ${res.status} ${raw.slice(0, 200)}`
     );
   }
 
-  return res.json() as Promise<T>;
+  // Some n8n workflows respond with an empty body (e.g. when the webhook is
+  // set to "Respond Immediately" or the last node doesn't produce output).
+  // Treat that as a successful no-op rather than throwing on JSON.parse.
+  if (!raw) return undefined as T;
+
+  try {
+    return JSON.parse(raw) as T;
+  } catch {
+    throw new Error(
+      `n8n webhook ${name} returned non-JSON response: ${raw.slice(0, 200)}`
+    );
+  }
 }
