@@ -1,6 +1,7 @@
 import { requireBot } from "@/lib/bot";
 import { SubmitButton } from "@/components/submit-button";
 import { formatDistanceToNow } from "@/lib/format";
+import { RefreshWebsiteCard } from "./refresh-website-card";
 import {
   updateBusinessDetails,
   updateSystemPrompt,
@@ -66,35 +67,19 @@ export default async function SettingsPage() {
             Your FAQs and uploaded documents are kept as-is.
           </div>
         </div>
-        <div className="space-y-3 p-6 pt-0 text-sm">
-          <form action={refreshWebsiteKnowledge} className="space-y-3">
-            <input type="hidden" name="bot_id" value={bot.id} />
-            <Field
-              id="website_url"
-              label="Website URL"
-              type="url"
-              defaultValue={bot.website_url ?? ""}
-            />
-            <div className="flex items-center justify-between gap-3">
-              <p className="text-xs text-muted-foreground">
-                {bot.raw_scrape_updated_at
-                  ? `Last refreshed ${formatDistanceToNow(bot.raw_scrape_updated_at)}`
-                  : bot.raw_scrape
-                    ? "Refreshed (timestamp unavailable)"
-                    : "Not yet scraped"}
-              </p>
-              <SubmitButton
-                pendingText="Starting..."
-                className="h-9 rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground hover:bg-primary/90"
-              >
-                Refresh website knowledge
-              </SubmitButton>
-            </div>
-            <p className="rounded-md border bg-muted/40 p-3 text-xs text-muted-foreground">
-              Scraping and recomposing usually takes 60-90 seconds. Refresh this
-              page after a minute to see the updated prompt.
-            </p>
-          </form>
+        <div className="p-6 pt-0 text-sm">
+          <RefreshWebsiteCard
+            botId={bot.id}
+            defaultUrl={bot.website_url ?? ""}
+            lastRefreshedLabel={
+              bot.raw_scrape_updated_at
+                ? `Last refreshed ${formatDistanceToNow(bot.raw_scrape_updated_at)}`
+                : bot.raw_scrape
+                  ? "Refreshed (timestamp unavailable)"
+                  : "Not yet scraped"
+            }
+            refreshAction={refreshWebsiteKnowledge}
+          />
         </div>
       </section>
 
