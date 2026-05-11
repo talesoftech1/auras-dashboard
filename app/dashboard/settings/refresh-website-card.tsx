@@ -101,12 +101,20 @@ export function RefreshWebsiteCard({
         </label>
         <input
           id="website_url"
-          type="url"
+          type="text"
+          inputMode="url"
+          autoCapitalize="none"
+          autoCorrect="off"
+          spellCheck={false}
+          placeholder="mangocafe.co.za"
           value={url}
           onChange={(e) => setUrl(e.target.value)}
           disabled={pending || counting}
           className="w-full rounded-md border bg-transparent px-3 py-2 shadow-sm disabled:opacity-60"
         />
+        <p className="text-[11px] text-muted-foreground">
+          Type it however — bare domain, www., or full https:// URL all work.
+        </p>
       </div>
 
       <div className="flex items-center justify-between gap-3">

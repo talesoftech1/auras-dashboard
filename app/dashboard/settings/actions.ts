@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { after } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { callN8n } from "@/lib/n8n";
+import { normalizeWebsiteUrl } from "@/lib/url";
 
 async function requireUser(botId: string) {
   const supabase = await createClient();
@@ -62,7 +63,11 @@ export async function updateSystemPrompt(formData: FormData) {
  */
 export async function refreshWebsiteKnowledge(formData: FormData) {
   const botId = String(formData.get("bot_id") ?? "");
-  const websiteUrl = String(formData.get("website_url") ?? "").trim();
+  // Accept casual forms (bare domain, www.foo, http://, https://) and
+  // canonicalise before persisting + handing to Bot Factory.
+  const websiteUrl = normalizeWebsiteUrl(
+    formData.get("website_url") as string | null,
+  );
   if (!websiteUrl) throw new Error("Website URL required");
 
   const { userId } = await requireUser(botId);

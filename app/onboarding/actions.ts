@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getCurrentUser } from "@/lib/auth";
 import { notifyOps } from "@/lib/notify";
 import { callN8n } from "@/lib/n8n";
+import { normalizeWebsiteUrl } from "@/lib/url";
 
 /**
  * Mirrors the format used by the FindBusiness lead-gen pipeline:
@@ -50,7 +51,11 @@ export async function createBot(formData: FormData) {
   const companyName = String(formData.get("company_name") ?? "").trim();
   if (!companyName) throw new Error("Business name is required");
 
-  const websiteUrl = String(formData.get("website_url") ?? "").trim() || null;
+  // Accept the casual forms (bare domain, www.foo, http://, https://) — the
+  // normalizer hands back a clean URL or throws a friendly error.
+  const websiteUrl = normalizeWebsiteUrl(
+    formData.get("website_url") as string | null,
+  );
   const contactPhone =
     String(formData.get("contact_phone") ?? "").trim() || null;
 

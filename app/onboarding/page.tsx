@@ -117,9 +117,13 @@ function BusinessForm({ userEmail }: { userEmail: string }) {
       <Field
         id="website_url"
         label="Website (optional)"
-        type="url"
-        placeholder="https://mangocafe.co.za"
-        hint="Helps us pre-fill your bot's knowledge base. You can skip this."
+        type="text"
+        placeholder="mangocafe.co.za"
+        inputMode="url"
+        autoCapitalize="none"
+        autoCorrect="off"
+        spellCheck={false}
+        hint="Type it however — mangocafe.co.za, www.mangocafe.co.za, or with https://. We'll figure it out."
       />
       <Field
         id="contact_phone"
@@ -245,6 +249,10 @@ function Field({
   placeholder,
   required,
   hint,
+  inputMode,
+  autoCapitalize,
+  autoCorrect,
+  spellCheck,
 }: {
   id: string;
   label: string;
@@ -252,6 +260,10 @@ function Field({
   placeholder?: string;
   required?: boolean;
   hint?: string;
+  inputMode?: React.HTMLAttributes<HTMLInputElement>["inputMode"];
+  autoCapitalize?: string;
+  autoCorrect?: string;
+  spellCheck?: boolean;
 }) {
   return (
     <div className="space-y-1">
@@ -268,6 +280,10 @@ function Field({
         type={type}
         placeholder={placeholder}
         required={required}
+        inputMode={inputMode}
+        autoCapitalize={autoCapitalize}
+        autoCorrect={autoCorrect}
+        spellCheck={spellCheck}
         className="w-full rounded-md border bg-transparent px-3 py-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
       />
       {hint && <p className="text-[11px] text-muted-foreground">{hint}</p>}
