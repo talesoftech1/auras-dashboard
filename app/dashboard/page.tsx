@@ -34,21 +34,28 @@ export default async function DashboardHome() {
   ]);
 
   return (
-    <div className="mx-auto max-w-5xl space-y-8">
+    <div className="mx-auto max-w-5xl space-y-5">
       <div>
-        <h1 className="text-3xl font-semibold">{primary.company_name}</h1>
-        <p className="text-muted-foreground">
-          Trigger keyword: <span className="font-mono">{primary.trigger_keyword}</span>
+        <h1 className="text-2xl font-semibold sm:text-3xl">
+          {primary.company_name}
+        </h1>
+        <p className="text-sm text-muted-foreground">
+          Trigger keyword:{" "}
+          <span className="font-mono">{primary.trigger_keyword}</span>
           {" · "}
-          Status: <span className="capitalize">{primary.status ?? "pending"}</span>
+          Status:{" "}
+          <span className="capitalize">{primary.status ?? "pending"}</span>
         </p>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      {/* Compact 4-up stat row. Two columns on phones (so each card is still
+          readable), four from sm: up so the heatmap + chart show above the
+          fold on a laptop. */}
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4">
         <StatCard
           label="Conversations (7d)"
           value={conversations7d.toLocaleString()}
-          hint="Customers your bot has chatted with this week"
+          hint="Customers this week"
         />
         <StatCard
           label="Unanswered"
@@ -59,11 +66,14 @@ export default async function DashboardHome() {
           }
           hint={
             unanswered > 0 ? (
-              <Link href="/dashboard/unanswered" className="underline underline-offset-4">
+              <Link
+                href="/dashboard/unanswered"
+                className="underline underline-offset-2"
+              >
                 Review the queue
               </Link>
             ) : (
-              "Nothing waiting on you — nice."
+              "Nothing waiting"
             )
           }
         />
@@ -72,58 +82,65 @@ export default async function DashboardHome() {
           value={formatHours(timeSaved.hours)}
           hint={
             timeSaved.answered === 0
-              ? "We start counting once your bot answers customers"
-              : `${timeSaved.answered.toLocaleString()} questions confidently answered this month`
+              ? "Counting starts on first answer"
+              : `${timeSaved.answered.toLocaleString()} questions answered`
           }
           valueClassName="text-emerald-600"
         />
         <CostMeterCard used={cost.used} limit={cost.limit} pct={cost.pct} />
       </div>
 
-      <section className="rounded-xl border bg-card p-6 shadow-sm">
-        <div className="flex items-baseline justify-between">
-          <div>
-            <h2 className="text-lg font-semibold">When customers chat</h2>
-            <p className="text-sm text-muted-foreground">
-              Customer messages by hour and weekday — last 30 days, SAST.
-            </p>
-          </div>
+      <section className="rounded-xl border bg-card p-4 shadow-sm sm:p-5">
+        <div>
+          <h2 className="text-base font-semibold">When customers chat</h2>
+          <p className="text-xs text-muted-foreground">
+            Customer messages by hour and weekday — last 30 days, SAST.
+          </p>
         </div>
-        <div className="mt-4">
+        <div className="mt-3">
           <ActivityHeatmap grid={heatmap.grid} max={heatmap.max} />
         </div>
       </section>
 
-      <section className="rounded-xl border bg-card p-6 shadow-sm">
+      <section className="rounded-xl border bg-card p-4 shadow-sm sm:p-5">
         <div>
-          <h2 className="text-lg font-semibold">Answer quality</h2>
-          <p className="text-sm text-muted-foreground">
+          <h2 className="text-base font-semibold">Answer quality</h2>
+          <p className="text-xs text-muted-foreground">
             Daily share of bot replies that gave a confident, useful answer.
           </p>
         </div>
-        <div className="mt-4">
+        <div className="mt-3">
           <AnswerRateChart data={answerRate} />
         </div>
       </section>
 
-      <section className="rounded-xl border bg-card p-6 shadow-sm">
-        <h2 className="text-lg font-semibold">Next steps</h2>
-        <p className="text-sm text-muted-foreground">
+      <section className="rounded-xl border bg-card p-4 shadow-sm sm:p-5">
+        <h2 className="text-base font-semibold">Next steps</h2>
+        <p className="text-xs text-muted-foreground">
           Quick links to the most common tweaks.
         </p>
-        <ul className="mt-4 space-y-2 text-sm">
+        <ul className="mt-3 space-y-1.5 text-sm">
           <li>
-            <Link href="/dashboard/knowledge" className="underline underline-offset-4">
+            <Link
+              href="/dashboard/knowledge"
+              className="underline underline-offset-4"
+            >
               Upload a price list or FAQ document
             </Link>
           </li>
           <li>
-            <Link href="/dashboard/settings" className="underline underline-offset-4">
+            <Link
+              href="/dashboard/settings"
+              className="underline underline-offset-4"
+            >
               Review the system prompt &amp; tone
             </Link>
           </li>
           <li>
-            <Link href="/dashboard/unanswered" className="underline underline-offset-4">
+            <Link
+              href="/dashboard/unanswered"
+              className="underline underline-offset-4"
+            >
               Check the unanswered queue
             </Link>
           </li>
@@ -133,6 +150,11 @@ export default async function DashboardHome() {
   );
 }
 
+/**
+ * Cost meter shown in the 4-up stat row. Matches StatCard sizing so heights
+ * align, but adds a progress bar underneath that tints amber > 75% / red > 90%
+ * so owners get a nudge before they hit their monthly cap.
+ */
 function CostMeterCard({
   used,
   limit,
@@ -142,7 +164,6 @@ function CostMeterCard({
   limit: number;
   pct: number;
 }) {
-  // Tint the bar amber > 75%, red > 90% so owners get a nudge before they hit it.
   const barColor =
     pct >= 90
       ? "bg-red-500"
@@ -151,26 +172,26 @@ function CostMeterCard({
         : "bg-primary";
 
   return (
-    <div className="rounded-xl border bg-card p-4 shadow-sm">
-      <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+    <div className="rounded-xl border bg-card p-3 shadow-sm sm:p-4">
+      <div className="text-[10px] font-medium uppercase tracking-wide text-muted-foreground sm:text-xs">
         Messages this month
       </div>
-      <div className="mt-2 text-3xl font-semibold leading-tight">
+      <div className="mt-1 text-xl font-semibold leading-tight sm:text-2xl">
         {used.toLocaleString()}
-        <span className="ml-1 text-base font-normal text-muted-foreground">
+        <span className="ml-1 text-xs font-normal text-muted-foreground sm:text-sm">
           / {limit.toLocaleString()}
         </span>
       </div>
-      <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-muted">
+      <div className="mt-2 h-1 w-full overflow-hidden rounded-full bg-muted">
         <div
           className={`h-full rounded-full transition-all ${barColor}`}
           style={{ width: `${Math.min(100, pct)}%` }}
         />
       </div>
-      <div className="mt-1 text-xs text-muted-foreground">
+      <div className="mt-1 line-clamp-2 text-[10px] text-muted-foreground sm:text-xs">
         {pct < 100
-          ? `${(100 - pct).toFixed(0)}% of your monthly allowance still available`
-          : "Monthly limit reached — message us to upgrade"}
+          ? `${(100 - pct).toFixed(0)}% remaining`
+          : "Monthly limit reached"}
       </div>
     </div>
   );
