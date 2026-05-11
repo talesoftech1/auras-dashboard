@@ -36,7 +36,7 @@ export default async function KnowledgePage() {
       </div>
 
       <section className="rounded-xl border bg-card shadow">
-        <div className="flex items-center justify-between p-6">
+        <div className="flex flex-col gap-3 p-5 sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:p-6">
           <div>
             <div className="font-semibold">Documents</div>
             <div className="text-sm text-muted-foreground">
@@ -48,9 +48,12 @@ export default async function KnowledgePage() {
         {docs.length > 0 && (
           <ul className="divide-y border-t text-sm">
             {docs.map((d) => (
-              <li key={d.id} className="flex items-center justify-between p-4">
-                <div>
-                  <div className="font-medium">{d.file_name}</div>
+              <li
+                key={d.id}
+                className="flex flex-col gap-2 p-4 sm:flex-row sm:items-center sm:justify-between sm:gap-4"
+              >
+                <div className="min-w-0">
+                  <div className="truncate font-medium">{d.file_name}</div>
                   <div className="text-xs text-muted-foreground">
                     Uploaded {formatDistanceToNow(d.uploaded_at)}
                     {d.extracted_text
@@ -60,7 +63,7 @@ export default async function KnowledgePage() {
                         : " · stored — format not yet readable, convert to PDF for the bot to use"}
                   </div>
                 </div>
-                <form action={deleteDocument}>
+                <form action={deleteDocument} className="shrink-0">
                   <input type="hidden" name="bot_id" value={bot.id} />
                   <input type="hidden" name="doc_id" value={d.id} />
                   <input
@@ -70,7 +73,7 @@ export default async function KnowledgePage() {
                   />
                   <SubmitButton
                     pendingText="Removing..."
-                    className="text-muted-foreground hover:text-destructive"
+                    className="text-xs text-muted-foreground hover:text-destructive sm:text-sm"
                   >
                     Remove
                   </SubmitButton>
@@ -125,17 +128,20 @@ export default async function KnowledgePage() {
         {faqs.length > 0 && (
           <ul className="divide-y border-t text-sm">
             {faqs.map((f) => (
-              <li key={f.id} className="flex items-start justify-between gap-4 p-4">
-                <div>
+              <li
+                key={f.id}
+                className="flex flex-col gap-2 p-4 sm:flex-row sm:items-start sm:justify-between sm:gap-4"
+              >
+                <div className="min-w-0">
                   <div className="font-medium">{f.question}</div>
                   <div className="text-muted-foreground">{f.answer}</div>
                 </div>
-                <form action={deleteFaq}>
+                <form action={deleteFaq} className="shrink-0">
                   <input type="hidden" name="bot_id" value={bot.id} />
                   <input type="hidden" name="faq_id" value={f.id} />
                   <SubmitButton
                     pendingText="Removing..."
-                    className="text-muted-foreground hover:text-destructive"
+                    className="text-xs text-muted-foreground hover:text-destructive sm:text-sm"
                   >
                     Remove
                   </SubmitButton>

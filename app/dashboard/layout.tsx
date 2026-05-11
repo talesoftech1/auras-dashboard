@@ -1,22 +1,8 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth";
-import {
-  Home,
-  MessagesSquare,
-  HelpCircle,
-  FileText,
-  Settings,
-  LogOut,
-} from "lucide-react";
-
-const navItems = [
-  { href: "/dashboard", label: "Home", icon: Home },
-  { href: "/dashboard/conversations", label: "Conversations", icon: MessagesSquare },
-  { href: "/dashboard/unanswered", label: "Unanswered", icon: HelpCircle },
-  { href: "/dashboard/knowledge", label: "Knowledge", icon: FileText },
-  { href: "/dashboard/settings", label: "Settings", icon: Settings },
-];
+import { LogOut } from "lucide-react";
+import { DesktopNavItems, MobileBottomNav } from "./nav";
 
 export default async function DashboardLayout({
   children,
@@ -28,25 +14,17 @@ export default async function DashboardLayout({
 
   return (
     <div className="flex min-h-screen">
-      <aside className="hidden w-60 shrink-0 border-r bg-muted/20 p-4 md:block">
+      {/* Desktop sidebar — hidden on mobile, where MobileBottomNav takes over */}
+      <aside className="hidden w-60 shrink-0 flex-col border-r bg-muted/20 p-4 md:flex">
         <div className="mb-8 px-2">
           <Link href="/dashboard" className="text-lg font-semibold">
             Auras
           </Link>
         </div>
         <nav className="space-y-1">
-          {navItems.map(({ href, label, icon: Icon }) => (
-            <Link
-              key={href}
-              href={href}
-              className="flex items-center gap-3 rounded-md px-3 py-2 text-sm text-muted-foreground hover:bg-accent hover:text-foreground"
-            >
-              <Icon className="h-4 w-4" />
-              {label}
-            </Link>
-          ))}
+          <DesktopNavItems />
         </nav>
-        <div className="absolute bottom-4 left-4 right-4 w-52">
+        <div className="mt-auto pt-4">
           <div className="rounded-md border bg-background p-3 text-xs">
             <div className="truncate font-medium">{user.email}</div>
             <form action="/auth/signout" method="post" className="mt-2">
@@ -61,7 +39,32 @@ export default async function DashboardLayout({
           </div>
         </div>
       </aside>
-      <main className="flex-1 px-6 py-8">{children}</main>
+
+      {/* Main column. On mobile it gets a sticky top bar + bottom-bar padding;
+          on desktop it's just the content area. */}
+      <div className="flex min-w-0 flex-1 flex-col">
+        <header className="sticky top-0 z-30 flex items-center justify-between border-b bg-background/95 px-4 py-3 backdrop-blur supports-[backdrop-filter]:bg-background/80 md:hidden">
+          <Link href="/dashboard" className="text-base font-semibold">
+            Auras
+          </Link>
+          <form action="/auth/signout" method="post">
+            <button
+              type="submit"
+              className="flex items-center gap-1.5 rounded-md px-2 py-1 text-xs text-muted-foreground hover:text-foreground"
+              aria-label="Sign out"
+            >
+              <LogOut className="h-3.5 w-3.5" />
+              <span>Sign out</span>
+            </button>
+          </form>
+        </header>
+
+        <main className="flex-1 px-4 py-6 pb-24 md:px-6 md:py-8 md:pb-8">
+          {children}
+        </main>
+      </div>
+
+      <MobileBottomNav />
     </div>
   );
 }

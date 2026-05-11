@@ -24,15 +24,15 @@ export default async function OnboardingPage() {
   const bot = rawBot as Bot | null;
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-2xl flex-col px-4 py-12">
-      <header className="mb-8">
+    <main className="mx-auto flex min-h-screen max-w-2xl flex-col px-4 py-8 sm:px-6 sm:py-12">
+      <header className="mb-6 sm:mb-8">
         <Link href="/dashboard" className="text-lg font-semibold">
           Auras
         </Link>
-        <h1 className="mt-6 text-3xl font-semibold">
+        <h1 className="mt-5 text-2xl font-semibold sm:mt-6 sm:text-3xl">
           {bot ? "Try out your bot" : "Welcome to Auras"}
         </h1>
-        <p className="mt-1 text-muted-foreground">
+        <p className="mt-1 text-sm text-muted-foreground sm:text-base">
           {bot
             ? "Your bot is live on the shared Auras WhatsApp number. Here's how to chat with it."
             : "Two short steps and your AI assistant will be ready to test on WhatsApp."}
@@ -41,7 +41,7 @@ export default async function OnboardingPage() {
 
       <Stepper currentStep={bot ? 2 : 1} />
 
-      <section className="mt-8 rounded-xl border bg-card p-6 shadow-sm">
+      <section className="mt-6 rounded-xl border bg-card p-5 shadow-sm sm:mt-8 sm:p-6">
         {bot === null ? (
           <BusinessForm userEmail={user.email ?? ""} />
         ) : (
@@ -58,7 +58,7 @@ function Stepper({ currentStep }: { currentStep: 1 | 2 }) {
     { n: 2, label: "Try it on WhatsApp" },
   ];
   return (
-    <ol className="flex items-center gap-2 text-xs text-muted-foreground">
+    <ol className="flex flex-wrap items-center gap-x-2 gap-y-2 text-xs text-muted-foreground">
       {steps.map((s, i) => {
         const done = currentStep > s.n;
         const active = currentStep === s.n;
@@ -66,7 +66,7 @@ function Stepper({ currentStep }: { currentStep: 1 | 2 }) {
           <li key={s.n} className="flex items-center gap-2">
             <span
               className={
-                "flex h-6 w-6 items-center justify-center rounded-full border text-[11px] font-medium " +
+                "flex h-6 w-6 shrink-0 items-center justify-center rounded-full border text-[11px] font-medium " +
                 (done
                   ? "border-primary bg-primary text-primary-foreground"
                   : active
@@ -76,11 +76,19 @@ function Stepper({ currentStep }: { currentStep: 1 | 2 }) {
             >
               {done ? "✓" : s.n}
             </span>
-            <span className={active ? "font-medium text-foreground" : ""}>
+            <span
+              className={
+                "whitespace-nowrap " +
+                (active ? "font-medium text-foreground" : "")
+              }
+            >
               {s.label}
             </span>
             {i < steps.length - 1 && (
-              <span className="mx-1 h-px w-6 bg-border" aria-hidden />
+              <span
+                className="mx-1 hidden h-px w-6 bg-border sm:inline-block"
+                aria-hidden
+              />
             )}
           </li>
         );
@@ -158,11 +166,11 @@ function TestDriveScreen({ bot }: { bot: Bot }) {
         </p>
       </div>
 
-      <div className="rounded-md border bg-muted/40 p-6 text-center">
+      <div className="rounded-md border bg-muted/40 p-5 text-center sm:p-6">
         <div className="text-xs uppercase tracking-wide text-muted-foreground">
           Your bot&apos;s code
         </div>
-        <div className="mt-2 font-mono text-4xl font-bold tracking-[0.4em]">
+        <div className="mt-2 break-all font-mono text-3xl font-bold tracking-[0.25em] sm:text-4xl sm:tracking-[0.4em]">
           {code}
         </div>
         <div className="mt-2 text-xs text-muted-foreground">
@@ -170,11 +178,11 @@ function TestDriveScreen({ bot }: { bot: Bot }) {
         </div>
       </div>
 
-      <ol className="space-y-3 rounded-md border p-5 text-sm">
+      <ol className="space-y-3 rounded-md border p-4 text-sm sm:p-5">
         <Step n={1}>Open WhatsApp on your phone.</Step>
         <Step n={2}>
           Send a message to{" "}
-          <span className="font-mono">
+          <span className="break-all font-mono">
             {SHARED_WHATSAPP_NUMBER ||
               "your Auras number (set NEXT_PUBLIC_AURAS_WHATSAPP_NUMBER)"}
           </span>{" "}

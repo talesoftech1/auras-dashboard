@@ -77,7 +77,7 @@ export function UnansweredCardActions({
         disabled={busy}
         className="w-full rounded-md border bg-transparent p-2 text-sm shadow-sm disabled:opacity-60"
       />
-      <div className="flex items-center gap-2">
+      <div className="flex flex-wrap items-center gap-2">
         <button
           type="button"
           onClick={() => handle("save", saveAsFaq)}

@@ -56,9 +56,9 @@ function QuestionCard({
   return (
     <div className="rounded-xl border bg-card shadow">
       <div className="p-5">
-        <div className="flex items-baseline justify-between gap-4">
+        <div className="flex flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between sm:gap-4">
           <div className="font-medium">&ldquo;{question.question}&rdquo;</div>
-          <div className="text-xs text-muted-foreground">
+          <div className="shrink-0 text-xs text-muted-foreground">
             {question.user_phone} · {formatDistanceToNow(question.asked_at)}
           </div>
         </div>
