@@ -116,14 +116,15 @@ function BusinessForm({ userEmail }: { userEmail: string }) {
       />
       <Field
         id="website_url"
-        label="Website (optional)"
+        label="Website"
         type="text"
         placeholder="mangocafe.co.za"
+        required
         inputMode="url"
         autoCapitalize="none"
         autoCorrect="off"
         spellCheck={false}
-        hint="Type it however — mangocafe.co.za, www.mangocafe.co.za, or with https://. We'll figure it out."
+        hint="We use this to learn about your business and build your bot's knowledge. Type it however — mangocafe.co.za, www.mangocafe.co.za, or with https://."
       />
       <Field
         id="contact_phone"

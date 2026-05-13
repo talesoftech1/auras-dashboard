@@ -51,11 +51,18 @@ export async function createBot(formData: FormData) {
   const companyName = String(formData.get("company_name") ?? "").trim();
   if (!companyName) throw new Error("Business name is required");
 
+  // Website is required — we feed it to Bot Factory to build the bot's
+  // knowledge base, and the bots.website_url column is NOT NULL.
   // Accept the casual forms (bare domain, www.foo, http://, https://) — the
   // normalizer hands back a clean URL or throws a friendly error.
   const websiteUrl = normalizeWebsiteUrl(
     formData.get("website_url") as string | null,
   );
+  if (!websiteUrl) {
+    throw new Error(
+      "Website is required so we can learn about your business and build your bot.",
+    );
+  }
   const contactPhone =
     String(formData.get("contact_phone") ?? "").trim() || null;
 
@@ -106,35 +113,30 @@ export async function createBot(formData: FormData) {
     title: "New customer signed up",
     body: `${companyName} (${user.email ?? "no email"}) — code: ${
       bot.trigger_keyword
-    }, phone: ${contactPhone ?? "not given"}, website: ${
-      websiteUrl ?? "none"
-    }`,
+    }, phone: ${contactPhone ?? "not given"}, website: ${websiteUrl}`,
     botId: bot.id,
   });
 
-  // If a website was provided, kick off Bot Factory to scrape it and
-  // overwrite the stub system_prompt with a real Claude-built knowledge base.
-  // The webhook responds immediately (responseMode: onReceived) and the
-  // n8n workflow continues running on its own — usually finishes in 60-90s.
-  // Bot Factory's update path filters on system_prompt_source='auto', so if
-  // the customer manually edits their prompt before enrichment lands, their
-  // edit wins.
-  if (websiteUrl) {
-    try {
-      await callN8n("bot_factory", user.id, {
-        bot_id: bot.id,
-        company_name: companyName,
-        trigger_keyword: bot.trigger_keyword,
-        website_url: websiteUrl,
-        contact_email: user.email ?? "",
-        phone: contactPhone ?? "",
-        owner_user_id: user.id,
-      });
-    } catch (err) {
-      // Enrichment failing isn't fatal — the customer still has a working
-      // bot with the stub prompt and can upload docs manually.
-      console.error("Bot Factory enrichment kickoff failed", err);
-    }
+  // Kick off Bot Factory to scrape the website and overwrite the stub
+  // system_prompt with a real Claude-built knowledge base. The webhook
+  // responds immediately (responseMode: onReceived) and the n8n workflow
+  // continues running on its own — usually finishes in 60-90s. Bot Factory's
+  // update path filters on system_prompt_source='auto', so if the customer
+  // manually edits their prompt before enrichment lands, their edit wins.
+  try {
+    await callN8n("bot_factory", user.id, {
+      bot_id: bot.id,
+      company_name: companyName,
+      trigger_keyword: bot.trigger_keyword,
+      website_url: websiteUrl,
+      contact_email: user.email ?? "",
+      phone: contactPhone ?? "",
+      owner_user_id: user.id,
+    });
+  } catch (err) {
+    // Enrichment failing isn't fatal — the customer still has a working
+    // bot with the stub prompt and can upload docs manually.
+    console.error("Bot Factory enrichment kickoff failed", err);
   }
 
   revalidatePath("/onboarding");
